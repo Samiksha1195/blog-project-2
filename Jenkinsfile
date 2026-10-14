@@ -55,12 +55,18 @@ pipeline {
             steps {
                 sshagent(credentials: ['app-ssh-key']) {
                     sh '''
+                        set -eu
+
                         ssh -o StrictHostKeyChecking=yes \
                             ec2-user@"$APP_HOST" \
-                            "cd /opt/blog/app && \
-                             sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/' .env && \
-                             docker compose pull && \
-                             docker compose up -d --remove-orphans"
+                            'whoami'
+
+                        ssh -o StrictHostKeyChecking=yes \
+                            ec2-user@"$APP_HOST" \
+                            "cd /opt/blog/app &&
+                             sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/' .env &&
+                             docker-compose pull &&
+                             docker-compose up -d --remove-orphans"
                     '''
                 }
             }
