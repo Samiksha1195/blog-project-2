@@ -1,0 +1,22 @@
+---
+- name: Create blog database and user
+  hosts: db
+  become: true
+  vars_files:
+    - secrets.yml
+
+  tasks:
+    - name: Create database
+      community.mysql.mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_unix_socket: /var/lib/mysql/mysql.sock
+
+    - name: Create application database user
+      community.mysql.mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        host: "10.0.2.%"
+        state: present
+        login_unix_socket: /var/lib/mysql/mysql.sock
